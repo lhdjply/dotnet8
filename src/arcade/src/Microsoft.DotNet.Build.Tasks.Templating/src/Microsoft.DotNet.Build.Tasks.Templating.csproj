@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Templating task package</Description>
+    <IsPackable>true</IsPackable>
+    <PackageTags>Arcade Build Tool Templating</PackageTags>
+    <IncludeSymbols>false</IncludeSymbols>
+    <DevelopmentDependency>true</DevelopmentDependency>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCoreVersion)" />
+  </ItemGroup>
+
+  <Import Project="$(RepositoryEngineeringDir)BuildTask.targets" />
+
+</Project>

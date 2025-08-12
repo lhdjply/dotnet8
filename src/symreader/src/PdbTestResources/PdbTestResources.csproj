@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsShipping>false</IsShipping>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cmd" />
+    <Content Include="Resources\**\*.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SourceLink.dll">
+      <LogicalName>SourceLink.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.pdb">
+      <LogicalName>SourceLink.pdb</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

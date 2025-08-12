@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+  <ItemGroup>
+    <InstallerProjectReference Include="Microsoft.NETCore.App/*.sfxproj" />
+    <InstallerProjectReference Include="installers/*.proj" />
+    <InstallerProjectReference Include="bundle/*.bundleproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildDebPackage)' == 'true'">
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-debian.proj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildRpmPackage)' == 'true'">
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-azl.3.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-centos.8.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-cm.1.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-cm.2.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-fedora.27.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-fedora.34.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-opensuse.42.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-oraclelinux.8.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-rhel.8.proj" />
+    <InstallerProjectReference Include="installers/dotnet-runtime-deps/dotnet-runtime-deps-sles.12.proj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildNETStandard21TargetingPack)' == 'true' and '$(BuildRpmPackage)' == 'true'">
+    <InstallerProjectReference Include="installers/netstandard2.1.proj" />
+  </ItemGroup>
+
+  <Target Name="BuildInstallerProjects" BeforeTargets="Build">
+    <MSBuild Projects="@(InstallerProjectReference)"
+             Targets="GenerateInstallers"
+             SkipNonexistentTargets="true" />
+  </Target>
+</Project>

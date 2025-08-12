@@ -1,0 +1,17 @@
+{
+  "files.trimTrailingWhitespace": true,
+  "files.associations": {
+    "*.*proj": "xml",
+    "*.props": "xml",
+    "*.targets": "xml",
+    "*.tasks": "xml"
+  },
+  "[yaml]": {
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.tabSize": 2
+  },
+  "dotnet.defaultSolution": "Razor.sln",
+  "omnisharp.defaultLaunchSolution": "Razor.sln"
+}

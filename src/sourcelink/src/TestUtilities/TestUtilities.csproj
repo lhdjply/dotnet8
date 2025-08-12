@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net472;$(NetCurrent)</TargetFrameworks>
+    <IsShipping>false</IsShipping>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="$(MicrosoftBuildVersion)" />
+    <PackageReference Include="NuGet.Versioning" Version="$(NuGetVersioningVersion)" />
+    <PackageReference Include="xunit.Combinatorial" version="$(XunitCombinatorialVersion)" />
+    <PackageReference Include="xunit.assert" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit.core" Version="$(XunitVersion)" />
+    <!-- Upgrade the NETStandard.Library transitive xunit dependency to avoid transitive 1.x NS dependencies. -->
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <_DotNetSdkBuildIInfoFile>BuildInfo.g.cs</_DotNetSdkBuildIInfoFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\NullableAttributes.cs" Link="Common\NullableAttributes.cs" />
+  </ItemGroup>
+
+  <Target Name="_GenerateSdkVersionAttribute" BeforeTargets="CoreCompile" Outputs="$(IntermediateOutputPath)$(_DotNetSdkBuildIInfoFile)">
+    <ItemGroup>
+      <_Attribute Include="TestUtilities.BuildInfoAttribute">
+        <_Parameter1>$(NETCoreSdkVersion)</_Parameter1>
+        <_Parameter2>$(ArtifactsShippingPackagesDir)</_Parameter2>
+        <_Parameter3>$(ArtifactsLogDir)</_Parameter3>
+      </_Attribute>
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(_Attribute)" Language="$(Language)" OutputFile="$(IntermediateOutputPath)$(_DotNetSdkBuildIInfoFile)">
+      <Output TaskParameter="OutputFile" ItemName="Compile" />
+      <Output TaskParameter="OutputFile" ItemName="FileWrites" />
+    </WriteCodeFragment>
+  </Target>
+</Project>

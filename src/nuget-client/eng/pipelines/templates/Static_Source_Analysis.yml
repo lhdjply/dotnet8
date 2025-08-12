@@ -1,0 +1,30 @@
+parameters:
+  - name: isOfficialBuild
+    type: boolean
+    default: false
+
+steps:
+- task: PowerShell@1
+  displayName: "Print Environment Variables"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      Get-ChildItem Env: | Sort-Object Name | Format-Table -Wrap -AutoSize
+
+- task: CredScan@3
+  displayName: "CredScan"
+  continueOnError: ${{ parameters.isOfficialBuild }}
+  condition: succeededOrFailed()
+
+- task: PostAnalysis@2
+  displayName: "CredScan: Post Analysis"
+  inputs:
+    GdnBreakAllTools: false
+    GdnBreakGdnToolCredScan: true
+  continueOnError: ${{ parameters.isOfficialBuild }}
+
+- script: dotnet format whitespace --verify-no-changes NuGet.sln
+  name: dotnetFormatWhitespace
+  displayName: Check whitespace formatting
+  continueOnError: ${{ parameters.isOfficialBuild }}
+  condition: succeededOrFailed()

@@ -1,0 +1,18 @@
+{
+  "name": "host-probes-rid-assets-legacy",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0", // test opts into using the legacy graph.
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "os=alpine", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/330#issuecomment-1911461723
+    "vmr-ci", // test fails against stage 1 build (https://github.com/redhat-developer/dotnet-regular-tests/issues/289#issuecomment-1705268294)
+    // see https://github.com/canonical/dotnet-regular-tests/issues/17 for skips below
+    "os=ubuntu.26.04,version=8.0",
+    "os=ubuntu.26.04,version=9.0"
+  ],
+  "ignoredRIDs":[
+  ]
+}

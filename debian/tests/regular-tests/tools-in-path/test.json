@@ -1,0 +1,16 @@
+{
+  "name": "tools-in-path",
+  "enabled": true,
+  "version": "6.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "vmr-ci", // tools PATH not configured (tar.gz build)
+    "os=fedora.44", // Fedora packages stopped updating PATH with 44
+    "os=fedora.45",
+    "toolchains-ci" // CI builds unreleased .NET versions, which may not have published tools in NuGet.org
+  ],
+  "ignoredRIDs": [
+  ]
+}

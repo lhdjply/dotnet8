@@ -1,0 +1,160 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+
+  <PropertyGroup>
+    <UseCrossArchCrossgen2 Condition="'$(CrossBuild)' == 'true' or '$(BuildArchitecture)' != '$(TargetArchitecture)' or '$(EnableNativeSanitizers)' != ''">true</UseCrossArchCrossgen2>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(CoreClrProjectRoot)/tools/aot/crossgen2/crossgen2_inbuild.csproj" OutputItemType="Crossgen2" />
+    <ProjectReference Include="$(CoreClrProjectRoot)/tools/dotnet-pgo/dotnet-pgo.csproj" OutputItemType="DotNetPgo" Condition="'$(DotNetBuildFromSource)' != 'true'" />
+    <ProjectReference Include="$([MSBuild]::NormalizePath('$(CoreClrProjectRoot)', 'System.Private.CoreLib', 'System.Private.CoreLib.csproj'))" OutputItemType="CoreLib" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OSPlatformConfig>$(TargetOS).$(TargetArchitecture).$(Configuration)</OSPlatformConfig>
+    <RootBinDir>$([MSBuild]::NormalizeDirectory('$(RepoRoot)', 'artifacts'))</RootBinDir>
+    <LogsDir>$([MSBuild]::NormalizeDirectory('$(RootBinDir)', 'log'))</LogsDir>
+    <BinDir>$([MSBuild]::NormalizeDirectory('$(RootBinDir)', 'bin', 'coreclr', $(OSPlatformConfig)))</BinDir>
+    <IntermediatesDir>$([MSBuild]::NormalizeDirectory('$(RootBinDir)', 'obj', 'coreclr', $(OSPlatformConfig)))</IntermediatesDir>
+    <DotNetCli>$([MSBuild]::NormalizePath('$(RepoRoot)', 'dotnet.sh'))</DotNetCli>
+    <DotNetCli Condition="'$(OS)' == 'Windows_NT'">$([MSBuild]::NormalizePath('$(RepoRoot)', 'dotnet.cmd'))</DotNetCli>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BuildDll>true</BuildDll>
+    <BuildDll Condition="'$(TargetOS)' == 'netbsd' or '$(TargetOS)' == 'illumos' or '$(TargetOS)' == 'solaris'">false</BuildDll>
+    <BuildDll Condition="'$(TargetArchitecture)' == 'riscv64'">false</BuildDll>
+
+    <BuildPdb>false</BuildPdb>
+    <BuildPdb Condition="$(BuildDll) and '$(OS)' == 'Windows_NT' and '$(TargetOS)' == 'windows'">true</BuildPdb>
+
+    <BuildPerfMap>false</BuildPerfMap>
+    <BuildPerfMap Condition="$(BuildDll) and '$(TargetOS)' == 'linux'">true</BuildPerfMap>
+
+    <_MergeMibcFilesCacheFile>$(MibcOptimizationDataDir)/$(TargetOS)/$(TargetArchitecture)/merge_mibc_files.cache</_MergeMibcFilesCacheFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <OptimizationMibcFiles Include="$(MibcOptimizationDataDir)/$(TargetOS)/$(TargetArchitecture)/**/*.mibc" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CoreLibAssemblyName>System.Private.CoreLib</CoreLibAssemblyName>
+    <CoreLibOutputPath>$([MSBuild]::NormalizePath('$(BinDir)', '$(CoreLibAssemblyName).dll'))</CoreLibOutputPath>
+    <CoreLibNiPdbPath></CoreLibNiPdbPath>
+    <CoreLibPerfMapPath></CoreLibPerfMapPath>
+    <CoreLibNiPdbPath Condition="$(BuildPdb)">$([MSBuild]::NormalizePath('$(BinDir)', 'PDB', '$(CoreLibAssemblyName).ni.pdb'))</CoreLibNiPdbPath>
+    <CoreLibPerfMapPath Condition="$(BuildPerfMap)">$([MSBuild]::NormalizePath('$(BinDir)', '$(CoreLibAssemblyName).ni.r2rmap'))</CoreLibPerfMapPath>
+    <MergedMibcPath>$([MSBuild]::NormalizePath('$(BinDir)', 'StandardOptimizationData.mibc'))</MergedMibcPath>
+  </PropertyGroup>
+
+  <!-- Creates a hash file that changes whenever the input mibc file modification times change.
+       This will trigger a re-merge when updating to a new version of the optimization data,
+       even if the new timestamps are still days in the past. -->
+  <Target Name="GenerateMergeMibcFilesInputCache">
+    <ItemGroup>
+      <_MergeMibcFilesInputCache Include="@(OptimizationMibcFiles)" />
+      <_MergeMibcFilesInputCache Include="@(DotNetPgo)" />
+      <_MergeMibcFilesInputCache Include="@(OptimizationMibcFiles->'%(ModifiedTime)')" />
+    </ItemGroup>
+
+    <Hash ItemsToHash="@(_MergeMibcFilesInputCache)">
+      <Output TaskParameter="HashResult" PropertyName="_MergeMibcFilesInputCacheHash" />
+    </Hash>
+
+    <WriteLinesToFile
+      Lines="$(_MergeMibcFilesInputCacheHash)"
+      File="$(_MergeMibcFilesCacheFile)"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(_MergeMibcFilesCacheFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="MergeMibcFiles"
+          DependsOnTargets="GenerateMergeMibcFilesInputCache"
+          Inputs="$(_MergeMibcFilesCacheFile);@(OptimizationMibcFiles);@(DotNetPgo)"
+          Condition="'@(DotNetPgo)' != ''"
+          Outputs="$(MergedMibcPath)">
+
+    <PropertyGroup>
+      <DotNetPgoCmd>$(DotNetCli) @(DotNetPgo) merge</DotNetPgoCmd>
+      <DotNetPgoCmd>$(DotNetPgoCmd) -o:$(MergedMibcPath)</DotNetPgoCmd>
+      <DotNetPgoCmd>$(DotNetPgoCmd) @(OptimizationMibcFiles->'-i:%(Identity)', ' ')</DotNetPgoCmd>
+      <DotNetPgoCmd>$(DotNetPgoCmd) --compressed false</DotNetPgoCmd> <!-- Signing service doesn't handle compressed mibc signing correctly. -->
+    </PropertyGroup>
+
+    <Message Importance="High" Text="$(DotNetPgoCmd)"/>
+    <Exec Command="$(DotNetPgoCmd)" />
+  </Target>
+
+  <Target Name="CreateMergedMibcFile"
+          DependsOnTargets="ResolveProjectReferences;MergeMibcFiles" />
+
+  <Target Name="PrepareInvokeCrossgen" DependsOnTargets="ResolveProjectReferences;CreateMergedMibcFile">
+    <ItemGroup>
+      <Crossgen2Inputs Include="@(CoreLib)" />
+      <Crossgen2Inputs Include="$(MergedMibcPath)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <Crossgen2OutputPath>%(Crossgen2.RootDir)%(Crossgen2.Directory)</Crossgen2OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <Crossgen2Files Include="$(Crossgen2OutputPath)/*.dll;$(Crossgen2OutputPath)/*.so;$(Crossgen2OutputPath)/*.dylib" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="InvokeCrossgen"
+          DependsOnTargets="PrepareInvokeCrossgen;CreateMergedMibcFile"
+          Inputs="@(Crossgen2Inputs);@(Crossgen2Files)"
+          Outputs="$(CoreLibOutputPath);$(CoreLibNiPdbPath);$(CoreLibPerfMapPath)"
+          AfterTargets="Build">
+
+    <MakeDir
+      Directories="$(BinDir);$(IntermediatesDir);$(LogsDir)" />
+
+    <Message Importance="High"
+      Text="Generating native image of System.Private.CoreLib for $(OSPlatformConfig). Logging to $(CrossGenCoreLibLog)" />
+
+    <PropertyGroup>
+      <CrossGenDllCmd>$(DotNetCli) @(Crossgen2)</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) -o:$(CoreLibOutputPath)</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) -r:$([MSBuild]::NormalizePath('$(BinDir)', 'IL', '*.dll'))</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) --targetarch:$(TargetArchitecture)</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) --targetos:$(TargetOS)</CrossGenDllCmd>
+      <CrossGenDllCmd Condition="'$(UsingToolIbcOptimization)' != 'true' and '$(EnableNgenOptimization)' == 'true'">$(CrossGenDllCmd) -m:$(MergedMibcPath) --embed-pgo-data</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) -O</CrossGenDllCmd>
+      <CrossGenDllCmd  Condition="'$(Configuration)' == 'Debug' or '$(Configuration)' == 'Checked'">$(CrossGenDllCmd) --verify-type-and-field-layout</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) @(CoreLib)</CrossGenDllCmd>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(BuildPdb)">
+      <CrossGenDllCmd>$(CrossGenDllCmd) --pdb --pdb-path:$([MSBuild]::NormalizePath('$(BinDir)', 'PDB'))</CrossGenDllCmd>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(BuildPerfMap)">
+      <CrossGenDllCmd>$(CrossGenDllCmd) --perfmap-format-version:1</CrossGenDllCmd>
+      <CrossGenDllCmd>$(CrossGenDllCmd) --perfmap --perfmap-path:$(BinDir)</CrossGenDllCmd>
+    </PropertyGroup>
+
+    <Message Condition="$(BuildDll)" Importance="High" Text="$(CrossGenDllCmd)" />
+
+    <Exec Condition="$(BuildDll)" Command="$(CrossGenDllCmd)" />
+
+    <Message Condition="$(BuildPdb)" Importance="High" Text="$(CrossGenPdbCmd)" />
+
+    <Exec Condition="$(BuildPdb) and '$(CrossGenPdbCmd)' != ''" Command="$(CrossGenPdbCmd)" />
+
+    <Message Condition="$(BuildPerfMap)" Importance="High" Text="$(CrossGenPerfMapCmd)" />
+
+    <Exec Condition="$(BuildPerfMap) and '$(CrossGenPerfMapCmd)' != ''" Command="$(CrossGenPerfMapCmd)" />
+
+    <Copy Condition="!$(BuildDll)" SourceFiles="@(CoreLib)" DestinationFiles="$(CoreLibOutputPath)" UseHardlinksIfPossible="true" />
+
+    <Message Importance="High" Text="Crossgenning of System.Private.CoreLib succeeded." />
+    <Message Importance="High" Text="Product binaries are available at $(BinDir)" />
+  </Target>
+</Project>

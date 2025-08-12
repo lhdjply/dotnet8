@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(NetCurrent);netstandard2.0</TargetFrameworks>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+    <IsPackable>true</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\Internal\DisposeAction.cs" Link="Internal\DisposeAction.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Manually reference Microsoft.Cci.dll via a PackageDownload+Reference item instead of
+         using a PackageReference to avoid bringing in the old dependency graph. -->
+    <PackageDownload Include="Microsoft.Cci" Version="[$(MicrosoftCciVersion)]" />
+    <Reference Include="$(NuGetPackageRoot)microsoft.cci\$(MicrosoftCciVersion)\lib\netstandard1.3\Microsoft.Cci.dll" />
+    <PackageReference Include="System.Composition" Version="$(SystemCompositionVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryVersion)" />
+    <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
+  </ItemGroup>
+
+</Project>

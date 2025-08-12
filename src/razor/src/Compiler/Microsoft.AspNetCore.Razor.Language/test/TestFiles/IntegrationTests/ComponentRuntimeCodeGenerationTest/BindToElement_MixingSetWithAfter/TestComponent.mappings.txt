@@ -1,0 +1,15 @@
+﻿Source Location: (91:1,7 [159] x:\dir\subdir\Test\TestComponent.cshtml)
+|
+    public string ParentValue { get; set; } = "hi";
+
+    public void UpdateValue(string value) => ParentValue = value;
+    public void AfterUpdate() { }
+|
+Generated Location: (2087:48,7 [159] )
+|
+    public string ParentValue { get; set; } = "hi";
+
+    public void UpdateValue(string value) => ParentValue = value;
+    public void AfterUpdate() { }
+|
+
