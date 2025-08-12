@@ -1,0 +1,46 @@
+<Project>
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <!-- TODO: Remove when Arcade offers an in-built way to filter out anything other than NetCurrent: https://github.com/dotnet/arcade/issues/13390. -->
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(TargetFrameworks)' != '' and '$(DotNetBuildFromSource)' == 'true'">$(NetCurrent)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <!-- Upgrade the NETStandard.Library transitive xunit dependency to avoid transitive 1.x NS dependencies. -->
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" Condition="'$(TargetFrameworkIdentifier)' != '.NETStandard'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NuspecProperty Include="DesktopTfm=net472"/>
+    <NuspecProperty Include="CoreTfm=$(NetCurrent)" Condition="'$(DotNetBuildFromSource)' == 'true'"/>
+    <NuspecProperty Include="CoreTfm=$(NetMinimum)" Condition="'$(DotNetBuildFromSource)' != 'true'"/>
+  </ItemGroup>
+
+  <!-- 
+    Workaround for https://github.com/NuGet/Home/issues/6754: cyclic dependency.
+  -->
+  <PropertyGroup>
+    <_ProjectDefinedPackageId>$(PackageId)</_ProjectDefinedPackageId>
+    <PackageId>*fake_packageid_for_project_$(MSBuildProjectName)*</PackageId>
+  </PropertyGroup>
+
+  <!-- 
+    Workaround for https://github.com/Microsoft/msbuild/issues/2527.
+  -->
+  <PropertyGroup>
+    <ImplicitlyExpandNETStandardFacades Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">false</ImplicitlyExpandNETStandardFacades>
+  </PropertyGroup>
+
+  <!--
+     Workaround for cyclic package reference. PackageId is set to ain invalid value above (in evaluation phase to be picked up by Restore),
+     then updated to the actual value before Pack target and SourceLink source package generation target.
+  -->
+  <Target Name="_UpdatePackageId" BeforeTargets="$(PackDependsOn);InitializeSourceControlInformation" >
+    <PropertyGroup>
+      <PackageId>$(_ProjectDefinedPackageId)</PackageId>
+      <PackageId Condition="'$(PackageId)' == ''">$(AssemblyName)</PackageId>
+      <PackageId Condition="'$(PackageId)' == ''">$(MSBuildProjectName)</PackageId>
+    </PropertyGroup>
+  </Target>
+</Project>

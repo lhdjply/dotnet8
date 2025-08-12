@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
+    <ExcludeFromSourceBuild>false</ExcludeFromSourceBuild>
+    <IsPackable>true</IsPackable>
+    <PackTasks>false</PackTasks>
+    <Description>Targets for producing an archive of file outputs.</Description>
+    <PackageType>MSBuildSdk</PackageType>
+  </PropertyGroup>
+
+  <Import Project="$(RepositoryEngineeringDir)BuildTask.targets" />
+
+</Project>

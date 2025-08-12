@@ -1,0 +1,11 @@
+﻿Source Location: (86:1,7 [102] x:\dir\subdir\Test\TestComponent.cshtml)
+|
+    public int ParentValue { get; set; } = 42;
+    public EventCallback UpdateValue { get; set; }
+|
+Generated Location: (2084:39,7 [102] )
+|
+    public int ParentValue { get; set; } = 42;
+    public EventCallback UpdateValue { get; set; }
+|
+

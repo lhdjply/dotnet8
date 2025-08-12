@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Needed for CLRTestTargetUnsupported -->
+    <RequiresProcessIsolation>true</RequiresProcessIsolation>
+    <RestorePackages>false</RestorePackages>
+    <CLRTestPriority>1</CLRTestPriority>
+    <!-- Test unsupported outside of windows -->
+    <CLRTestTargetUnsupported Condition="'$(TargetsWindows)' != 'true'">true</CLRTestTargetUnsupported>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Optimize />
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="loop2.cs" />
+  </ItemGroup>
+</Project>

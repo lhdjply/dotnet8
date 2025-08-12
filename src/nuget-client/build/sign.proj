@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+  <!-- Configuration/global properties -->
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <CommonMSBuildProperties>
+      Configuration=$(Configuration);
+      ReleaseLabel=$(ReleaseLabel);
+      BuildNumber=$(BuildNumber);
+      BuildRTM=$(BuildRTM);
+    </CommonMSBuildProperties>
+    <OutDir>$(RepositoryRootDirectory)</OutDir>
+    <SignTargetsDependOn>BatchSign</SignTargetsDependOn>
+    <SignTargetsDependOn Condition="'$(SignPackages)' == 'true'">GetOutputNupkgs</SignTargetsDependOn>
+    <SignTargetsDependOn Condition="'$(SignPackages)' == 'true' AND '$(BuildRTM)' != 'true'">GetOutputNupkgs;GetOutputVsix</SignTargetsDependOn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <FilesToSign Include="$(ArtifactsDirectory)microsoft.web.xdt\lib\net40\**\Microsoft.Web.XmlTransform.resources.dll">
+      <Authenticode>Microsoft400</Authenticode>
+      <StrongName>67</StrongName>
+    </FilesToSign>
+  </ItemGroup>
+
+  <Target Name="Sign"
+          BeforeTargets="AfterBuild"
+          DependsOnTargets="$(SignTargetsDependOn)" />
+
+  <Target Name="BatchSign">
+    <MSBuild Projects="@(SolutionProjectsWithoutVSIX)"
+             Targets="GetSigningInputs"
+             BuildInParallel="true">
+      <Output TaskParameter="TargetOutputs" ItemName="FilesToSign" />
+    </MSBuild>
+    
+    <MSBuild Projects="$(VSIXProject)"
+             Targets="GetThirdPartyAssemblies"
+             BuildInParallel="true">
+      <Output TaskParameter="TargetOutputs" ItemName="ThirdPartyAssembly" />
+    </MSBuild>
+    
+    <ItemGroup>
+      <FilesToSign Include="%(ThirdPartyAssembly.TargetPath)" Authenticode="3PartySHA2" />
+    </ItemGroup>
+
+    <Message Text="Files to sign:" Importance="High" />
+    <Message Text="  %(FilesToSign.Identity), Authenticode='%(FilesToSign.Authenticode)', StrongName='%(FilesToSign.StrongName)'" Importance="High" />
+  </Target>
+
+  <Target Name="GetOutputVsix">
+    <ItemGroup>
+      <FilesToSign Include="$(VsixPublishDestination)**\*.vsix">
+        <Authenticode>VsixSHA2</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GetOutputNupkgs">
+    <ItemGroup>
+      <FilesToSign Include="$(NupkgOutputDirectory)**\*.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+</Project>

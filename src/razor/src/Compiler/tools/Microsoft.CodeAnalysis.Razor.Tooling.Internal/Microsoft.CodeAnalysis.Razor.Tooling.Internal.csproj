@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Transport package for Razor compiler binaries. For internal use only.</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsShipping>false</IsShipping>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
+    <ExcludeFromSourceBuild>false</ExcludeFromSourceBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Microsoft.AspNetCore.Razor.Language\src\Microsoft.AspNetCore.Razor.Language.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\Microsoft.CodeAnalysis.Razor\src\Microsoft.CodeAnalysis.Razor.csproj" PrivateAssets="all" />
+
+    <Content Include="$(OutDir)Microsoft.AspNetCore.Razor.Language.dll" PackagePath="lib\$(TargetFramework)" />
+    <Content Include="$(OutDir)Microsoft.CodeAnalysis.Razor.dll" PackagePath="lib\$(TargetFramework)" />
+    <Content Include="$(OutDir)Microsoft.AspNetCore.Razor.Utilities.Shared.dll" PackagePath="lib\$(TargetFramework)" />
+    <Content Include="$(OutDir)Microsoft.Extensions.ObjectPool.dll" PackagePath="lib\$(TargetFramework)" />
+    <Content Include="$(OutDir)System.Collections.Immutable.dll" PackagePath="lib\$(TargetFramework)" />
+  </ItemGroup>
+
+</Project>

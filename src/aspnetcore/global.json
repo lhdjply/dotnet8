@@ -1,0 +1,34 @@
+{
+  "sdk": {
+    "version": "8.0.118"
+  },
+  "tools": {
+    "dotnet": "8.0.118",
+    "runtimes": {
+      "dotnet/x86": [
+        "$(MicrosoftNETCoreBrowserDebugHostTransportVersion)"
+      ],
+      "dotnet": [
+        "$(MicrosoftNETCoreBrowserDebugHostTransportVersion)"
+      ]
+    },
+    "vs": {
+      "version": "17.2",
+      "components": [
+        "Microsoft.VisualStudio.Component.VC.ATL",
+        "Microsoft.VisualStudio.Component.VC.ATL.ARM64",
+        "Microsoft.VisualStudio.Component.VC.Tools.ARM64",
+        "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+      ]
+    },
+    "xcopy-msbuild": "17.1.0"
+  },
+  "msbuild-sdks": {
+    "Yarn.MSBuild": "1.22.19",
+    "Microsoft.DotNet.Arcade.Sdk": "8.0.0-beta.25310.3",
+    "Microsoft.DotNet.Helix.Sdk": "8.0.0-beta.25310.3"
+  },
+  "native-tools": {
+    "jdk": "latest"
+  }
+}

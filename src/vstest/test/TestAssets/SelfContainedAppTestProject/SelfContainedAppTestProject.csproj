@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+
+    <!-- those two properties will make the app self-contained -->
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CVE-2019-0981 -->
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+    <!-- / CVE-2019-0981 -->
+
+    <PackageReference Include="MSTest.TestFramework" Version="$(MSTestTestFrameworkVersion)" />
+    <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestTestAdapterVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(PackageVersion)" />
+  </ItemGroup>
+
+</Project>

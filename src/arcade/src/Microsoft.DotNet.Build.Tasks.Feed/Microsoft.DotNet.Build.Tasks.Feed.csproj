@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(NetCurrent);$(NetFrameworkToolCurrent)</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <Description>This package provides support for publishing assets to a NuGet protocol based feed.</Description>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageType>MSBuildSdk</PackageType>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="$(AzureIdentityVersion)" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="$(AzureStorageBlobsVersion)" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MicrosoftBuildTasksCoreVersion)" />
+    <!-- Upgrade System.Security.Cryptography.Xml/6.0.0 which is referenced by Microsoft.Build.Tasks.Core. -->
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="$(SystemSecurityCryptographyXmlVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsDependencyInjectionAbstractionsVersion)" />
+    <PackageReference Include="Microsoft.SymbolUploader" Version="$(MicrosoftSymbolUploaderVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <!-- Maestro.Client stopped supporting .NET 4.7.2 long ago.
+         This functionality should eventually be moved into an arcade-services package,
+         but for users consuming other functionality we'll still support 4.7.2 by ifdefing it out. -->
+    <PackageReference Include="Microsoft.DotNet.Maestro.Client" Version="$(MicrosoftDotNetMaestroClientVersion)" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="$(MicrosoftBclHashCodeVersion)" />
+
+    <!-- Upgrade System.Security.Cryptography.X509Certificates/4.3.0 which is transitively referenced by Azure.Core. -->
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="$(SystemSecurityCryptographyX509CertificatesVersion)" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Microsoft.Arcade.Common\Microsoft.Arcade.Common.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.Deployment.Tasks.Links\Microsoft.DotNet.Deployment.Tasks.Links.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.VersionTools\lib\Microsoft.DotNet.VersionTools.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.ArcadeAzureIntegration\Microsoft.DotNet.ArcadeAzureIntegration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\Internal\EnumExtensions.cs" />
+  </ItemGroup>
+
+  <Import Project="$(RepositoryEngineeringDir)BuildTask.targets" />
+
+</Project>

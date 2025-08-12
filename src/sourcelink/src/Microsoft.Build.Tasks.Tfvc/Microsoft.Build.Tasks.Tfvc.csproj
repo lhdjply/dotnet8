@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AutoGenerateAssemblyVersion>true</AutoGenerateAssemblyVersion>
+    <SuppressFinalPackageVersion>true</SuppressFinalPackageVersion>
+
+    <!-- NuGet: Using an explicit nuspec file to customize TFM directory -->
+    <IsPackable>true</IsPackable>
+    <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+    <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+    
+    <PackageDescription>MSBuild tasks providing TFVC repository information.</PackageDescription>
+    <PackageTags>MSBuild Tasks TFVC source link</PackageTags>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="$(MicrosoftBuildVersion)" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MicrosoftBuildTasksCoreVersion)" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="$(MicrosoftTeamFoundationServerExtendedClientVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Common\NullableAttributes.cs" Link="Common\NullableAttributes.cs" />
+    <Compile Include="..\Common\PathUtilities.cs" Link="Common\PathUtilities.cs" />
+    <Compile Include="..\Common\UriUtilities.cs" Link="Common\UriUtilities.cs" />
+  </ItemGroup>
+</Project>

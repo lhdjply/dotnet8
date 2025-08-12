@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- MSB3270 Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) projects. -->
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <!-- MSB3276 Suppress warnings about conflicts between different versions of the same dependent assembly -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3276</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>$(TargetFrameworks);net472</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(RepoRoot)src\DataCollectors\DumpMinitool.arm64\DumpMinitool.arm64.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\DataCollectors\DumpMinitool\DumpMinitool.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\datacollector\datacollector.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\testhost.x86\testhost.x86.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\testhost\testhost.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\vstest.console\vstest.console.csproj" />
+    <ProjectReference Include="$(RepoRoot)playground\MSTest1\MSTest1.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\AttachVS\AttachVS.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <SourcePath>$(RepoRoot)artifacts\</SourcePath>
+      <DestinationPath>$(TargetDir)vstest.console\</DestinationPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <FileToCopy Include="$(SourcePath)bin\vstest.console\$(Configuration)\$(NetFrameworkMinimum)\win7-x64\**\*.*" SubFolder="" />
+      <FileToCopy Include="$(SourcePath)bin\Microsoft.TestPlatform.TestHostProvider\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="Extensions\" />
+
+      <!-- copy net462, net47, net471, net472 and net48 testhosts" -->
+      <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\$(NetFrameworkMinimum)\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost\$(Configuration)\$(NetFrameworkMinimum)\win7-x64\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\net47\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost\$(Configuration)\net47\win7-x64\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\net471\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost\$(Configuration)\net471\win7-x64\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\net472\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost\$(Configuration)\net472\win7-x64\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\net48\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />
+      <FileToCopy Include="$(SourcePath)bin\testhost\$(Configuration)\net48\win7-x64\**\*.*" SubFolder="TestHostNetFramework\" />
+
+      <!-- copy datacollectors" -->
+      <FileToCopy Include="$(SourcePath)bin\datacollector\$(Configuration)\net472\win7-x64\**\*.*" SubFolder="" />
+      <FileToCopy Include="$(SourcePath)bin\Microsoft.TestPlatform.Extensions.BlameDataCollector\$(Configuration)\net472\**\*.*" SubFolder="Extensions\" />
+      <FileToCopy Include="$(SourcePath)bin\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="Extensions\" />
+      <FileToCopy Include="$(SourcePath)bin\DataCollectors\DumpMinitool\$(Configuration)\$(NetFrameworkMinimum)\win7-x64\**\*.*" SubFolder="Extensions\blame\" />
+      <FileToCopy Include="$(SourcePath)bin\DataCollectors\DumpMinitool.x86\$(Configuration)\$(NetFrameworkMinimum)\win7-x86\**\*.*" SubFolder="Extensions\blame\" />
+      <FileToCopy Include="$(SourcePath)bin\DataCollectors\DumpMinitool.arm64\$(Configuration)\$(NetFrameworkMinimum)\win10-arm64\**\*.*" SubFolder="Extensions\blame\" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(FileToCopy)" DestinationFiles="@(FileToCopy -> '$(DestinationPath)\%(SubFolder)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" OverwriteReadOnlyFiles="True" Retries="3" RetryDelayMilliseconds="500" UseHardlinksIfPossible="False" UseSymboliclinksIfPossible="False" ErrorIfLinkFails="False" Condition="@(FileToCopy-&gt;Count()) &gt; 0">
+
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
+    </Copy>
+  </Target>
+</Project>

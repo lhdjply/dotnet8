@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
+    <Description>This package contains the Visual Studio Language Server infrastructure for interacting with contained languages.</Description>
+    <EnableApiCheck>false</EnableApiCheck>
+    <IsShippingPackage>false</IsShippingPackage>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+    <IsPackable Condition="'$(OS)' != 'Windows_NT'">false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Protocol" Version="$(MicrosoftVisualStudioLanguageServerProtocolPackageVersion)" />
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Protocol.Extensions" Version="$(MicrosoftVisualStudioLanguageServerProtocolExtensionsPackageVersion)" />
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Protocol.Internal" Version="$(MicrosoftVisualStudioLanguageServerProtocolInternalPackageVersion)" />
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Client.Implementation" Version="$(MicrosoftVisualStudioLanguageServerClientImplementationPackageVersion)" />
+    <!-- Manually upgrade to address CG alert. When the VS packages
+         pull in the right version, this can be removed. -->
+    <PackageReference Include="Microsoft.IO.Redist" Version="$(MicrosoftIORedistPackageVersion)" Condition="'$(TargetFramework)' == '$(DefaultNetFxTargetFramework)'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(SharedSourceRoot)\Microsoft.AspNetCore.Razor.Utilities.Shared\Microsoft.AspNetCore.Razor.Utilities.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+    <AdditionalFiles Include="InternalAPI.Shipped.txt" />
+    <AdditionalFiles Include="InternalAPI.Unshipped.txt" />
+  </ItemGroup>
+</Project>

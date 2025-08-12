@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net6.0;$(NetFrameworkMinimum)</TargetFrameworks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">false</Prefer32Bit>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
+    <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win7-x64</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+    <!--
+      NETSDK1201: For projects targeting .NET 8.0 and higher, specifying a RuntimeIdentifier will no longer produce a
+      self contained app by default. To continue building self-contained apps, set the SelfContained property to true
+      or use the -\-self-contained argument.
+      -->
+    <MSBuildWarningsAsMessages>NETSDK1201</MSBuildWarningsAsMessages>
+    <NoWarn>$(NoWarn);NETSDK1201</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\DumpMinitool.x86\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\MiniDumpWriteDump.cs" Link="MiniDumpWriteDump.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
+</Project>

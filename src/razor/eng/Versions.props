@@ -1,0 +1,192 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Opt-in arcade features -->
+  <PropertyGroup>
+    <UsingToolVSSDK>true</UsingToolVSSDK>
+    <MicrosoftVSSDKBuildToolsVersion>17.3.2094</MicrosoftVSSDKBuildToolsVersion>
+    <MicroBuildPluginsSwixBuildVersion>1.1.33</MicroBuildPluginsSwixBuildVersion>
+    <!-- Use .NET Framework reference assemblies from a nuget package so machine-global targeting packs do not need to be installed. -->
+    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
+    <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
+    <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
+  </PropertyGroup>
+  <!-- Opt out Arcade features -->
+  <PropertyGroup>
+    <UsingToolXliff>true</UsingToolXliff>
+  </PropertyGroup>
+  <!-- Versioning for assemblies/packages -->
+  <PropertyGroup>
+    <MajorVersion>7</MajorVersion>
+    <MinorVersion>0</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
+    <!--
+        When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
+    -->
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
+  </PropertyGroup>
+  <!--
+    Versioning for tooling releases.
+
+    Note: Using $(OfficialBuildId) because the other version-related properties are defined yet when this is
+    imported. This OK because we want to just have an obvious salt for a local build.
+  -->
+  <PropertyGroup>
+    <VsixVersionPrefix>17.8.3</VsixVersionPrefix>
+    <AddinMajorVersion>17.8</AddinMajorVersion>
+    <AddinVersion>$(AddinMajorVersion)</AddinVersion>
+    <AddinVersion Condition="'$(OfficialBuildId)' != ''">$(AddinVersion).$(OfficialBuildId)</AddinVersion>
+    <AddinVersion Condition="'$(OfficialBuildId)' == ''">$(AddinVersion).42424242.42</AddinVersion>
+  </PropertyGroup>
+  <!--
+
+    These versions should ONLY be updated by automation.
+
+    DO NOT UPDATE THESE MANUALLY. Use the `darc` command line tool to update this file so it stays in sync with
+    Version.Details.xml.
+
+    See https://github.com/dotnet/arcade/blob/main/Documentation/Darc.md for instructions on using darc.
+
+  -->
+  <PropertyGroup Label="Automated">
+    <MicrosoftNETCoreBrowserDebugHostTransportPackageVersion>6.0.2-servicing.22064.6</MicrosoftNETCoreBrowserDebugHostTransportPackageVersion>
+    <MicrosoftNETCorePlatformsPackageVersion>6.0.1</MicrosoftNETCorePlatformsPackageVersion>
+    <MicrosoftSourceBuildIntermediatesourcebuildreferencepackagesPackageVersion>9.0.0-alpha.1.23465.1</MicrosoftSourceBuildIntermediatesourcebuildreferencepackagesPackageVersion>
+    <MicrosoftNetCompilersToolsetPackageVersion>4.8.0-3.23475.1</MicrosoftNetCompilersToolsetPackageVersion>
+    <MicrosoftCommonLanguageServerProtocolFrameworkPackageVersion>4.8.0-3.23475.1</MicrosoftCommonLanguageServerProtocolFrameworkPackageVersion>
+    <MicrosoftCodeAnalysisExternalAccessRazorPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisExternalAccessRazorPackageVersion>
+    <MicrosoftCodeAnalysisExternalAccessRazorCompilerPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisExternalAccessRazorCompilerPackageVersion>
+    <MicrosoftCodeAnalysisExternalAccessOmniSharpCSharpPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisExternalAccessOmniSharpCSharpPackageVersion>
+    <MicrosoftCodeAnalysisCommonPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisCommonPackageVersion>
+    <MicrosoftCodeAnalysisCSharpPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisCSharpPackageVersion>
+    <MicrosoftCodeAnalysisCSharpEditorFeaturesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisCSharpEditorFeaturesPackageVersion>
+    <MicrosoftCodeAnalysisCSharpFeaturesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisCSharpFeaturesPackageVersion>
+    <MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>
+    <MicrosoftCodeAnalysisEditorFeaturesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisEditorFeaturesPackageVersion>
+    <MicrosoftCodeAnalysisEditorFeaturesCommonPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisEditorFeaturesCommonPackageVersion>
+    <MicrosoftCodeAnalysisEditorFeaturesTextPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisEditorFeaturesTextPackageVersion>
+    <MicrosoftCodeAnalysisEditorFeaturesWpfPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisEditorFeaturesWpfPackageVersion>
+    <MicrosoftCodeAnalysisRemoteServiceHubPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisRemoteServiceHubPackageVersion>
+    <MicrosoftCodeAnalysisTestUtilitiesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisTestUtilitiesPackageVersion>
+    <MicrosoftCodeAnalysisVisualBasicWorkspacesPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisVisualBasicWorkspacesPackageVersion>
+    <MicrosoftCodeAnalysisWorkspacesCommonPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisWorkspacesCommonPackageVersion>
+    <MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>4.8.0-3.23475.1</MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>
+    <MicrosoftVisualStudioLanguageServicesPackageVersion>4.8.0-3.23475.1</MicrosoftVisualStudioLanguageServicesPackageVersion>
+    <MicrosoftDotNetXliffTasksPackageVersion>1.0.0-beta.23475.1</MicrosoftDotNetXliffTasksPackageVersion>
+    <!--
+      Exception - Microsoft.Extensions.ObjectPool and System.Collections.Immutable packages are not updated by automation,
+      but are present in Version.Details.xml for source-build PVP flow. See the comment in Version.Details.xml for more information.
+    -->
+    <MicrosoftExtensionsObjectPoolPackageVersion>6.0.0</MicrosoftExtensionsObjectPoolPackageVersion>
+    <SystemCollectionsImmutablePackageVersion>6.0.0</SystemCollectionsImmutablePackageVersion>
+  </PropertyGroup>
+  <!--
+
+    ^^^^^^^^^^
+    SEE NOTE ABOVE.
+
+    Versions above this comment are updated automatically. Don't change them manually.
+
+    Versions below this comment are not managed by automation and can be changed as needed.
+  -->
+  <PropertyGroup Label="Manual">
+    <!-- Several packages from the editor are used for testing HTML support, and share the following version. -->
+    <Tooling_HtmlEditorPackageVersion>17.5.101-preview-0002</Tooling_HtmlEditorPackageVersion>
+    <MicrosoftVisualStudioShellPackagesVersion>17.7.36673</MicrosoftVisualStudioShellPackagesVersion>
+    <MicrosoftVisualStudioPackagesVersion>17.7.188</MicrosoftVisualStudioPackagesVersion>
+    <VisualStudioLanguageServerProtocolVersion>17.8.9-preview</VisualStudioLanguageServerProtocolVersion>
+    <!-- dotnet/runtime packages -->
+    <MicrosoftExtensionsPackageVersion>6.0.0</MicrosoftExtensionsPackageVersion>
+    <SystemCompositionPackageVersion>7.0.0</SystemCompositionPackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>6.0.0</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemResourcesExtensionsPackageVersion>6.0.0</SystemResourcesExtensionsPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>6.0.0</SystemTextEncodingsWebPackageVersion>
+    <SystemPrivateUriPackageVersion>4.3.2</SystemPrivateUriPackageVersion>
+    <MicrosoftExtensionsNonCapturingTimerSourcesPackageVersion>5.0.0-preview.4.20205.1</MicrosoftExtensionsNonCapturingTimerSourcesPackageVersion>
+    <BenchmarkDotNetPackageVersion>0.13.5.2136</BenchmarkDotNetPackageVersion>
+    <MicrosoftBuildLocatorPackageVersion>1.2.6</MicrosoftBuildLocatorPackageVersion>
+    <MicrosoftBuildPackageVersion>16.8.0</MicrosoftBuildPackageVersion>
+    <MicrosoftDiaSymReaderVersion>2.0.0</MicrosoftDiaSymReaderVersion>
+    <MicrosoftNETSdkRazorPackageVersion>6.0.0-alpha.1.21072.5</MicrosoftNETSdkRazorPackageVersion>
+    <!-- Packages from dotnet/roslyn -->
+    <MicrosoftNetCompilersToolsetVersion>$(MicrosoftNetCompilersToolsetPackageVersion)</MicrosoftNetCompilersToolsetVersion>
+    <MicrosoftCodeAnalysisAnalyzerTestingPackageVersion>1.1.2-beta1.24121.1</MicrosoftCodeAnalysisAnalyzerTestingPackageVersion>
+    <MicrosoftCodeAnalysisCSharpAnalyzerTestingXUnitPackageVersion>1.1.2-beta1.24121.1</MicrosoftCodeAnalysisCSharpAnalyzerTestingXUnitPackageVersion>
+    <MicrosoftCodeAnalysisTestingVerifiersXUnitPackageVersion>1.1.2-beta1.24121.1</MicrosoftCodeAnalysisTestingVerifiersXUnitPackageVersion>
+    <MicrosoftVisualStudioEditorPackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioEditorPackageVersion>
+    <MicrosoftVisualStudioExtensibilityTestingXunitVersion>0.1.169-beta</MicrosoftVisualStudioExtensibilityTestingXunitVersion>
+    <MicrosoftVisualStudioExtensibilityTestingSourceGeneratorVersion>$(MicrosoftVisualStudioExtensibilityTestingXunitVersion)</MicrosoftVisualStudioExtensibilityTestingSourceGeneratorVersion>
+    <MicrosoftVisualStudioLanguagePackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioLanguagePackageVersion>
+    <MicrosoftVisualStudioLanguageIntellisensePackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioLanguageIntellisensePackageVersion>
+    <MicrosoftVisualStudioLanguageServerClientImplementationPackageVersion>17.7.4-preview</MicrosoftVisualStudioLanguageServerClientImplementationPackageVersion>
+    <MicrosoftVisualStudioLanguageServerProtocolPackageVersion>$(VisualStudioLanguageServerProtocolVersion)</MicrosoftVisualStudioLanguageServerProtocolPackageVersion>
+    <MicrosoftVisualStudioLanguageServerProtocolExtensionsPackageVersion>$(VisualStudioLanguageServerProtocolVersion)</MicrosoftVisualStudioLanguageServerProtocolExtensionsPackageVersion>
+    <MicrosoftVisualStudioLanguageServerProtocolInternalPackageVersion>$(VisualStudioLanguageServerProtocolVersion)</MicrosoftVisualStudioLanguageServerProtocolInternalPackageVersion>
+    <MicrosoftVisualStudioLiveSharePackageVersion>0.3.1074</MicrosoftVisualStudioLiveSharePackageVersion>
+    <MicrosoftVisualStudioProjectSystemSDKPackageVersion>17.7.294-pre</MicrosoftVisualStudioProjectSystemSDKPackageVersion>
+    <MicrosoftVisualStudioShell150PackageVersion>$(MicrosoftVisualStudioShellPackagesVersion)</MicrosoftVisualStudioShell150PackageVersion>
+    <MicrosoftVisualStudioShellFrameworkPackageVersion>$(MicrosoftVisualStudioShellPackagesVersion)</MicrosoftVisualStudioShellFrameworkPackageVersion>
+    <MicrosoftVisualStudioInteropPackageVersion>$(MicrosoftVisualStudioShellPackagesVersion)</MicrosoftVisualStudioInteropPackageVersion>
+    <MicrosoftInternalVisualStudioInteropPackageVersion>$(MicrosoftVisualStudioShellPackagesVersion)</MicrosoftInternalVisualStudioInteropPackageVersion>
+    <MicrosoftVisualStudioRpcContractsPackageVersion>17.7.9</MicrosoftVisualStudioRpcContractsPackageVersion>
+    <MicrosoftVisualStudioTelemetryVersion>17.8.138</MicrosoftVisualStudioTelemetryVersion>
+    <MicrosoftVisualStudioTextDataPackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioTextDataPackageVersion>
+    <MicrosoftVisualStudioTextImplementationPackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioTextImplementationPackageVersion>
+    <MicrosoftVisualStudioTextLogicPackageVersion>$(MicrosoftVisualStudioPackagesVersion)</MicrosoftVisualStudioTextLogicPackageVersion>
+    <!-- NOTE: Keep O#-Roslyn's Microsoft.VisualStudio.Threading version in sync with the version below:
+    https://github.com/OmniSharp/omnisharp-roslyn/blob/d7555ebfb6c4d7c6811c58370322d3b092c0abf6/build/Packages.props#L65 -->
+    <MicrosoftVisualStudioThreadingPackageVersion>17.7.30</MicrosoftVisualStudioThreadingPackageVersion>
+    <MicrosoftVisualStudioWebPackageVersion>16.10.0-preview-1-31008-014</MicrosoftVisualStudioWebPackageVersion>
+    <!-- NOTE: Keep O#-Roslyn's Microsoft.VisualStudio.Validation version in sync with the version below:
+    https://github.com/OmniSharp/omnisharp-roslyn/blob/d7555ebfb6c4d7c6811c58370322d3b092c0abf6/build/Packages.props#L66 -->
+    <MicrosoftVisualStudioValidationPackageVersion>17.6.11</MicrosoftVisualStudioValidationPackageVersion>
+    <MicrosoftVisualStudioComponentModelHostPackageVersion>17.7.124-preview</MicrosoftVisualStudioComponentModelHostPackageVersion>
+    <MicrosoftWebToolsLanguagesHtmlPackageVersion>$(Tooling_HtmlEditorPackageVersion)</MicrosoftWebToolsLanguagesHtmlPackageVersion>
+    <MicrosoftWebToolsLanguagesLanguageServerServerPackageVersion>$(Tooling_HtmlEditorPackageVersion)</MicrosoftWebToolsLanguagesLanguageServerServerPackageVersion>
+    <MicrosoftWebToolsLanguagesSharedPackageVersion>$(Tooling_HtmlEditorPackageVersion)</MicrosoftWebToolsLanguagesSharedPackageVersion>
+    <MicrosoftWebToolsLanguagesSharedEditorPackageVersion>$(Tooling_HtmlEditorPackageVersion)</MicrosoftWebToolsLanguagesSharedEditorPackageVersion>
+    <MicrosoftWebToolsSharedPackageVersion>$(Tooling_HtmlEditorPackageVersion)</MicrosoftWebToolsSharedPackageVersion>
+    <MoqPackageVersion>4.16.0</MoqPackageVersion>
+    <MessagePackPackageVersion>2.5.108</MessagePackPackageVersion>
+    <NewtonsoftJsonPackageVersion>13.0.3</NewtonsoftJsonPackageVersion>
+    <NerdbankStreamsPackageVersion>2.10.69</NerdbankStreamsPackageVersion>
+    <NuGetSolutionRestoreManagerInteropVersion>4.8.0</NuGetSolutionRestoreManagerInteropVersion>
+    <OmniSharpExtensionsLanguageServerPackageVersion>0.19.7</OmniSharpExtensionsLanguageServerPackageVersion>
+    <OmniSharpExtensionsLanguageProtocolPackageVersion>$(OmniSharpExtensionsLanguageServerPackageVersion)</OmniSharpExtensionsLanguageProtocolPackageVersion>
+    <OmniSharpMSBuildPackageVersion>1.39.1</OmniSharpMSBuildPackageVersion>
+    <StreamJsonRpcPackageVersion>2.16.36</StreamJsonRpcPackageVersion>
+    <SystemRuntimeInteropServicesRuntimePackageVersion>4.3.0</SystemRuntimeInteropServicesRuntimePackageVersion>
+    <Tooling_MicrosoftCodeAnalysisAnalyzersPackageVersion>3.3.4</Tooling_MicrosoftCodeAnalysisAnalyzersPackageVersion>
+    <Tooling_MicrosoftCodeAnalysisBannedApiAnalyzersPackageVersion>$(Tooling_MicrosoftCodeAnalysisAnalyzersPackageVersion)</Tooling_MicrosoftCodeAnalysisBannedApiAnalyzersPackageVersion>
+    <Tooling_RoslynDiagnosticsAnalyzersPackageVersion>$(Tooling_MicrosoftCodeAnalysisAnalyzersPackageVersion)</Tooling_RoslynDiagnosticsAnalyzersPackageVersion>
+    <Tooling_MicrosoftVisualStudioLanguageServicesPackageVersion>$(MicrosoftVisualStudioLanguageServicesPackageVersion)</Tooling_MicrosoftVisualStudioLanguageServicesPackageVersion>
+    <XunitAnalyzersPackageVersion>0.10.0</XunitAnalyzersPackageVersion>
+    <XunitCombinatorialPackageVersion>1.4.1</XunitCombinatorialPackageVersion>
+    <XunitVersion>2.4.2</XunitVersion>
+    <XunitExtensibilityExecutionPackageVersion>$(XunitVersion)</XunitExtensibilityExecutionPackageVersion>
+    <!-- Temporary hack to workaround package restrictions for dev17 -->
+    <MicrosoftInternalVisualStudioShellFrameworkPackageVersion>$(MicrosoftVisualStudioShellPackagesVersion)</MicrosoftInternalVisualStudioShellFrameworkPackageVersion>
+    <MicrosoftIORedistPackageVersion>6.0.1</MicrosoftIORedistPackageVersion>
+    <!-- Compiler Deps -->
+    <DiffPlexVersion>1.5.0</DiffPlexVersion>
+    <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
+    <MicrosoftAspNetCoreAppVersion>8.0.0-rc.1.23421.29</MicrosoftAspNetCoreAppVersion>
+    <MicrosoftBuildLocatorVersion>1.4.1</MicrosoftBuildLocatorVersion>
+    <MicrosoftBuildVersion>17.3.0-preview-22364-05</MicrosoftBuildVersion>
+    <MicrosoftBuildFrameworkVersion>$(MicrosoftBuildVersion)</MicrosoftBuildFrameworkVersion>
+    <MicrosoftBuildUtilitiesCoreVersion>$(MicrosoftBuildVersion)</MicrosoftBuildUtilitiesCoreVersion>
+    <MicrosoftCSharpVersion>4.7.0</MicrosoftCSharpVersion>
+    <MicrosoftCssParserVersion>1.0.0-20230414.1</MicrosoftCssParserVersion>
+    <MicrosoftExtensionsDependencyModelVersion>6.0.0</MicrosoftExtensionsDependencyModelVersion>
+    <MicrosoftExtensionsFileSystemGlobbingVersion>6.0.0-preview.7.21377.19</MicrosoftExtensionsFileSystemGlobbingVersion>
+    <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
+    <SystemDiagnosticsDiagnosticSourceVersion>6.0.0</SystemDiagnosticsDiagnosticSourceVersion>
+    <SystemReflectionMetadataVersion>5.0.0</SystemReflectionMetadataVersion>
+    <SystemTextEncodingsWebVersion>6.0.0</SystemTextEncodingsWebVersion>
+    <SystemTextJsonVersion>6.0.0</SystemTextJsonVersion>
+    <XunitAssertVersion>$(XunitVersion)</XunitAssertVersion>
+    <XunitExtensibilityExecutionVersion>$(XunitVersion)</XunitExtensibilityExecutionVersion>
+    <!-- Benchmarks -->
+    <Benchmarks_BaselineSourceGeneratorsVersion>7.0.0-preview.5.22528.1</Benchmarks_BaselineSourceGeneratorsVersion>
+  </PropertyGroup>
+</Project>

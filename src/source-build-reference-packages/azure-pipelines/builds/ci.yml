@@ -1,0 +1,47 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - release/*
+
+pr:
+  branches:
+    include:
+    - main
+    - release/*
+
+variables:
+- template: /azure-pipelines/templates/variables/common.yml
+
+resources:
+  repositories:
+  - repository: MicroBuildTemplate
+    type: git
+    name: 1ESPipelineTemplates/MicroBuildTemplate
+    ref: refs/tags/release
+
+extends:
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  parameters:
+    sdl:
+      componentgovernance:
+        # All of the SBRPs must be ignored because it is possible some of them are for vulnerable versions.
+        # Because they are reference only packages they are not vulnerable themselves.
+        ignoreDirectories: |
+          artifacts/source-build/self,
+          src/referencePackages
+      sourceAnalysisPool:
+        name: $(DncEngInternalBuildPool)
+        image: 1es-windows-2022
+        os: windows
+    pool:
+      name: $(DncEngInternalBuildPool)
+      image: 1es-ubuntu-2204
+      os: linux
+    customBuildTags:
+    - ES365AIMigrationTooling
+    stages:
+    - template: /azure-pipelines/templates/stages/build.yml
+      parameters:
+        engCommonTemplatesDir: ${{ variables.EngCommonTemplatesDir }}

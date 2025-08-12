@@ -1,0 +1,15 @@
+﻿Source Location: (90:3,7 [104] x:\dir\subdir\Test\TestComponent.cshtml)
+|
+    private int counter;
+    private void Increment(ChangeEventArgs e) {
+        counter++;
+    }
+|
+Generated Location: (1532:37,7 [104] )
+|
+    private int counter;
+    private void Increment(ChangeEventArgs e) {
+        counter++;
+    }
+|
+

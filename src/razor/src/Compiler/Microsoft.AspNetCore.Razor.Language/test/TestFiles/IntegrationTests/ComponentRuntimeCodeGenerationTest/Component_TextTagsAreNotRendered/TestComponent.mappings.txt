@@ -1,0 +1,18 @@
+﻿Source Location: (14:1,1 [18] x:\dir\subdir\Test\TestComponent.cshtml)
+|if (true)
+{
+    |
+Generated Location: (745:19,1 [18] )
+|if (true)
+{
+    |
+
+Source Location: (66:3,38 [5] x:\dir\subdir\Test\TestComponent.cshtml)
+|
+}
+|
+Generated Location: (986:29,38 [5] )
+|
+}
+|
+

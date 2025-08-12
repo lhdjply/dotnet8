@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreAppCurrent)</TargetFramework>
+    <!-- don't need to run this on helix -->
+    <WasmCopyAppZipToHelixTestDir>false</WasmCopyAppZipToHelixTestDir>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <EnableAggressiveTrimming Condition="'$(EnableAOTAndTrimming)' != ''">$(EnableAOTAndTrimming)</EnableAggressiveTrimming>
+    <PublishTrimmed Condition="'$(EnableAOTAndTrimming)' != ''">$(EnableAOTAndTrimming)</PublishTrimmed>
+    <RunAOTCompilation Condition="'$(EnableAOTAndTrimming)' != ''">$(EnableAOTAndTrimming)</RunAOTCompilation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <WasmExtraFilesToDeploy Include="index.html" />
+    <WasmExtraFilesToDeploy Include="main.js" />
+    <WasmExtraFilesToDeploy Include="appstart-frame.html" />
+    <WasmExtraFilesToDeploy Include="frame-main.js" />
+    <WasmExtraFilesToDeploy Include="style.css" />
+    <Compile Remove="Console/Console.cs" />
+  </ItemGroup>
+
+  <Target Name="RunSample" DependsOnTargets="RunSampleWithBrowserAndSimpleServer" />
+</Project>

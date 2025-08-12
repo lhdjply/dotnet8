@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(NetCurrent);$(NetFrameworkToolCurrent)</TargetFrameworks>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Microsoft.DotNet.ApiCompat.csproj" />
+
+    <!-- Required for running the tests -->
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MicrosoftBuildTasksCoreVersion)" />
+    <!-- Upgrade System.Security.Cryptography.Xml/6.0.0 which is referenced by Microsoft.Build.Tasks.Core. -->
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="$(SystemSecurityCryptographyXmlVersion)" />
+
+    <_testProjectHelper Include="TestProjects\**\*.csproj" />
+    <_testProjectHelper Update="@(_testProjectHelper)">
+      <DestinationSubDirectory>Implementation\</DestinationSubDirectory>
+      <DestinationSubDirectory Condition="$([System.String]::Copy('%(Filename)').EndsWith('Contract'))">Contract\</DestinationSubDirectory>
+    </_testProjectHelper>
+
+    <ProjectReference Include="@(_testProjectHelper)" OutputItemType="ReferenceCopyLocalPaths" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestProjects\**\*.cs" />
+  </ItemGroup>
+
+</Project>
