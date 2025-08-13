@@ -1,3 +1,9 @@
+dotnet8 (8.0.128-8.0.28-0ubuntu1deepin1) unstable; urgency=medium
+
+  * Change the content of Architecture to any
+
+ -- lhdjply <lhdjply@126.com>  Sat, 13 Jun 2026 14:01:12 +0800
+
 dotnet8 (8.0.128-8.0.28-0ubuntu1~25.10.1) questing-security; urgency=medium
 
   [ Mateus Rodrigues de Morais ]
