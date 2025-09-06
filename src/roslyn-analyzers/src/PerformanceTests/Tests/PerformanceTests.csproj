@@ -4,6 +4,7 @@
     <LangVersion>preview</LangVersion>
     <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
+    <UseAppHost>false</UseAppHost>
   </PropertyGroup>
   <PropertyGroup>
     <NonShipping>true</NonShipping>

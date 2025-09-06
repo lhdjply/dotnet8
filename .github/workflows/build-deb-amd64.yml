@@ -1,0 +1,83 @@
+name: Build DEB Package amd64
+
+on:
+  push:
+    branches: [ '*' ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+  workflow_dispatch:
+
+jobs:
+  build-deb-amd64:
+    runs-on: ubuntu-latest
+    container:
+      image: linuxdeepin/deepin:crimson
+      options: --user root
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Update package lists and install basic tools
+      run: |
+        apt update
+        apt install -y deepin-desktop-base build-essential devscripts dh-make 
+
+    - name: Determine source format and generate orig tarball if needed
+      run: |
+        set -e
+        # Check if quilt format requires orig tarball
+        if [ -f debian/source/format ]; then
+          SOURCE_FORMAT=$(head -1 debian/source/format)
+          case "$SOURCE_FORMAT" in
+            "3.0 (quilt)"*)
+              echo "::notice::Detected quilt format package, generating orig tarball"
+              
+              # Extract source name and version
+              SOURCE_NAME=$(dpkg-parsechangelog -S Source)
+              UPSTREAM_VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//; s/^[0-9]\+://')
+
+              ORIG_TARBALL="${SOURCE_NAME}_${UPSTREAM_VERSION}.orig.tar.gz"
+              TEMP_DIR=$(mktemp -d)
+              cd ..
+              cp -r "${SOURCE_NAME}/." "${TEMP_DIR}/"
+              rm -rf "${TEMP_DIR}/debian"
+              tar -czf "${ORIG_TARBALL}" -C "${TEMP_DIR}" .
+
+              cd "${TEMP_DIR}"
+              ./prep.sh --no-bootstrap --no-prebuilts
+              cp -r ./.dotnet/. /usr/lib/dotnet
+              mkdir /usr/bin/dotnet
+              ln -s /usr/lib/dotnet/dotnet /usr/bin/dotnet/dotnet
+              mkdir /usr/lib/dotnet/source-built-artifacts
+              cp ./prereqs/packages/archive/*.tar.gz /usr/lib/dotnet/source-built-artifacts/Private.SourceBuilt.Artifacts.8.0.118.tar.gz
+              rm -rf "${TEMP_DIR}"
+              
+              echo "::notice::Orig tarball created: ../${SOURCE_NAME}_${UPSTREAM_VERSION}.orig.tar.gz"
+              ;;
+            *)
+              echo "::notice::Native package format detected, no orig tarball needed"
+              ;;
+          esac
+        else
+          echo "::warning::Missing debian/source/format, assuming native package format"
+        fi
+
+    - name: Install build dependencies
+      run: |
+        mk-build-deps -i -t "apt-get -y" "./debian/control"
+
+    - name: Create DEB package
+      run: dpkg-buildpackage -us -uc -b
+
+    - name: Move deb to deb_package
+      run: |
+        rm ../*dbgsym*.deb
+        mkdir deb_package
+        cp ../*.deb deb_package
+
+    - name: Upload DEB package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-amd64
+        path: deb_package/*.deb
+        if-no-files-found: error
