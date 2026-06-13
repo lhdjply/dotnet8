@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
     <NoWarn>$(NoWarn);NETSDK1138</NoWarn>
+    <UseAppHost>false</UseAppHost>
   </PropertyGroup>
   <PropertyGroup>
     <NonShipping>true</NonShipping>
