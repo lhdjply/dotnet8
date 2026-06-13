@@ -253,15 +253,14 @@ initDistroRidGlobal "$os" "$arch" ""
 
 LogDateStamp=$(date +"%m%d%H%M%S")
 
-"$CLI_ROOT/dotnet" build-server shutdown
+timeout --signal=KILL 10 "$CLI_ROOT/dotnet" build-server shutdown 2>/dev/null || true
 
 if [ "$alternateTarget" == "true" ]; then
   export NUGET_PACKAGES=$NUGET_PACKAGES/smoke-tests
   "$CLI_ROOT/dotnet" msbuild "$SCRIPT_ROOT/build.proj" -bl:"$SCRIPT_ROOT/artifacts/log/Debug/BuildTests_$LogDateStamp.binlog" -flp:"LogFile=$SCRIPT_ROOT/artifacts/logs/BuildTests_$LogDateStamp.log" -clp:v=m ${MSBUILD_ARGUMENTS[@]} "$@"
 else
   "$CLI_ROOT/dotnet" msbuild "$SCRIPT_ROOT/eng/tools/init-build.proj" -bl:"$SCRIPT_ROOT/artifacts/log/Debug/BuildXPlatTasks_$LogDateStamp.binlog" -flp:LogFile="$SCRIPT_ROOT/artifacts/logs/BuildXPlatTasks_$LogDateStamp.log" -t:PrepareOfflineLocalTools ${MSBUILD_ARGUMENTS[@]} "$@"
-  # kill off the MSBuild server so that on future invocations we pick up our custom SDK Resolver
-  "$CLI_ROOT/dotnet" build-server shutdown
+  timeout --signal=KILL 10 "$CLI_ROOT/dotnet" build-server shutdown 2>/dev/null || true
 
   "$CLI_ROOT/dotnet" msbuild "$SCRIPT_ROOT/build.proj" -bl:"$SCRIPT_ROOT/artifacts/log/Debug/Build_$LogDateStamp.binlog" -flp:"LogFile=$SCRIPT_ROOT/artifacts/logs/Build_$LogDateStamp.log" ${MSBUILD_ARGUMENTS[@]} "$@"
 fi

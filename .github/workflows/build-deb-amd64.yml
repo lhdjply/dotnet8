@@ -14,6 +14,9 @@ jobs:
     container:
       image: linuxdeepin/deepin:crimson
       options: --user root
+    env:
+      DOTNET_CLI_USE_MSBUILD_SERVER: "0"
+      MSBUILDUSESERVER: "0"
 
     steps:
     - uses: actions/checkout@v5

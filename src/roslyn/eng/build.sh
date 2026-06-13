@@ -208,7 +208,7 @@ function MakeBootstrapBuild {
   dotnet clean "$project_path"
 
   if [[ "$node_reuse" == true ]]; then
-    dotnet build-server shutdown
+    timeout --signal=KILL 10 dotnet build-server shutdown 2>/dev/null || true
   fi
 
   # return value

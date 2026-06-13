@@ -238,7 +238,7 @@
           Inputs="$(MSBuildProjectFullPath)"
           Outputs="$(RepoCompletedSemaphorePath)Build.complete">
 
-    <Exec Command="$(DotnetToolCommand) build-server shutdown" />
+    <Exec Command="timeout --signal=KILL 10 $(DotnetToolCommand) build-server shutdown 2&gt;/dev/null || true" IgnoreExitCode="true" />
 
     <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Building $(ProjectBuildReason)" />
     <Message Importance="High" Text="Running command:" />
